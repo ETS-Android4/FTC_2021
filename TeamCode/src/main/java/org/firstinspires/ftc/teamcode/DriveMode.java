@@ -32,7 +32,10 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -60,6 +63,9 @@ public class DriveMode extends OpMode
     private DcMotor leftDrive = null;
     private DcMotor rightDrive = null;
     private DcMotor armMotor = null;
+    private DcMotor flapper = null;
+    private CRServo spinner    = null;
+
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -73,13 +79,15 @@ public class DriveMode extends OpMode
         leftDrive  = hardwareMap.get(DcMotor.class, "left_drive");
         rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
         armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
-
+        flapper = hardwareMap.get(DcMotor.class, "flapper");
+        spinner = hardwareMap.get(CRServo.class, "spinner");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
         leftDrive.setDirection(DcMotor.Direction.FORWARD);
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
 
+        spinner.setDirection(DcMotorSimple.Direction.REVERSE);
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
     }
@@ -122,9 +130,18 @@ public class DriveMode extends OpMode
         double rightVal = gamepad1.right_trigger;
         double leftVal = gamepad1.left_trigger;
 
+        boolean flap_up = gamepad1.right_bumper;
+        boolean flap_down = gamepad1.left_bumper;
+
         double rightleftVal  =rightVal - leftVal;
         armPower = Range.clip(rightleftVal, -1.0, 1.0);
 
+        double flapper_power = 0.0f;
+        if(flap_up) {
+            flapper_power = 0.5;
+        } else if(flap_down) {
+            flapper_power = -0.5;
+        }
         // Tank Mode uses one stick to control each wheel.
         // - This requires no math, but it is hard to drive forward slowly and keep straight.
         // leftPower  = -gamepad1.left_stick_y ;
@@ -134,6 +151,13 @@ public class DriveMode extends OpMode
         leftDrive.setPower(leftPower);
         rightDrive.setPower(rightPower);
         armMotor.setPower(armPower);
+        flapper.setPower(flapper_power);
+        if(gamepad1.a || gamepad1.cross) {
+            spinner.setPower(1.0);
+        } else {
+            spinner.setPower(0.0);
+        }
+
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);

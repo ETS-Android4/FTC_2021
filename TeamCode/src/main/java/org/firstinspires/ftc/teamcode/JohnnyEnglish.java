@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -56,8 +57,8 @@ public class JohnnyEnglish
     public DcMotor  leftDrive   = null;
     public DcMotor  rightDrive  = null;
     public DcMotor  armMotor     = null;
-//    public Servo    leftClaw    = null;
-//    public Servo    rightClaw   = null;
+    private DcMotor flapper = null;
+    private CRServo spinner    = null;
 
     public static final double MID_SERVO       =  0.5 ;
     public static final double ARM_UP_POWER    =  0.45 ;
@@ -81,6 +82,8 @@ public class JohnnyEnglish
         leftDrive  = hwMap.get(DcMotor.class, "left_drive");
         rightDrive = hwMap.get(DcMotor.class, "right_drive");
         armMotor    = hwMap.get(DcMotor.class, "arm_motor");
+        flapper = hwMap.get(DcMotor.class, "flapper");
+        spinner = hwMap.get(CRServo.class, "spinner");
         leftDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         rightDrive.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
@@ -88,12 +91,14 @@ public class JohnnyEnglish
         leftDrive.setPower(0);
         rightDrive.setPower(0);
         armMotor.setPower(0);
-
+        flapper.setPower(0);
+        spinner.setPower(0.0);
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
         leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        flapper.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // Define and initialize ALL installed servos.
         // Fill them in when we get them
